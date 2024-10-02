@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+	font-family: 'it';
+	src: url(assets/fonts/it.ttf);
+}
+
+@font-face {
+	font-family: 'lmr';
+	src: url(assets/fonts/lmr.otf);
+}
+
+@font-face {
+	font-family: 'mont';
+	src: url(assets/fonts/mont.ttf);
+}
+
+@font-face {
+	font-family: 'montL';
+	src: url(assets/fonts/montL.ttf);
+}
+
+@font-face {
+	font-family: 'montM';
+	src: url(assets/fonts/montM.ttf);
+}
