@@ -554,6 +554,104 @@ video {
   display: none;
 }
 
+.relative {
+  position: relative;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.flex {
+  display: flex;
+}
+
+.h-\[150px\] {
+  height: 150px;
+}
+
+.h-\[20vh\] {
+  height: 20vh;
+}
+
+.h-\[5vh\] {
+  height: 5vh;
+}
+
+.h-screen {
+  height: 100vh;
+}
+
+.w-\[100\%\] {
+  width: 100%;
+}
+
+.max-w-\[50\%\] {
+  max-width: 50%;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.bg-\[\#16423C\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(22 66 60 / var(--tw-bg-opacity));
+}
+
+.pt-\[10\%\] {
+  padding-top: 10%;
+}
+
+.font-mont {
+  font-family: mont, sans-serif;
+}
+
+.text-\[125\%\] {
+  font-size: 125%;
+}
+
+.text-\[200\%\] {
+  font-size: 200%;
+}
+
+.text-\[250\%\] {
+  font-size: 250%;
+}
+
+.leading-\[50px\] {
+  line-height: 50px;
+}
+
+.text-\[\#C4DAD2\] {
+  --tw-text-opacity: 1;
+  color: rgb(196 218 210 / var(--tw-text-opacity));
+}
+
+.text-white {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.outline-none {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
 @font-face {
   font-family: 'it';
 
@@ -582,4 +680,8 @@ video {
   font-family: 'montM';
 
   src: url(assets/fonts/montM.ttf);
+}
+
+.word {
+  display:inline-block;
 }
