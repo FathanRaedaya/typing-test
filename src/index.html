@@ -14,10 +14,15 @@
 
     <section class="w-[100%] h-[5vh] flex justify-between items-center">
       <div id="time" class="text-white text-[125%]"></div>
+      <div id="restart">
+        <button id="restartBtn" class="bg-[#C4DAD2] text-[#16423C] px-4 py-2 rounded">New Test</button>
+      </div>
     </section>
 
-    <section class="w-[100%] h-[150px] overflow-hidden leading-[50px] relative outline-none" id="game" tabindex="0">
-      <div id="words" class="text-white text-[200%]"></div>
+    <section class="w-[100%] h-[150px] overflow-hidden leading-[50px] relative outline-none" id="test" tabindex="0">
+      <div id="words" class="text-white text-[200%] blur-[5px]"></div>
+      <div id="cursor" class="w-[2px] h-[40px] fixed bg-[#FFF0D1] top-[230px]"></div>
+      <div id="start" class="absolute inset-0 flex items-center justify-center text-white text-[125%]">Click here or press any key to start typing!</div>
     </section>
 
     </section>

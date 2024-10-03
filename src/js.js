@@ -22,9 +22,9 @@ const words = [
     "beside", "besides", "within", "beyond", "either", "neither", "such"
   ];
   
-const gameTime = 15 * 1000;
+const testTime = 15 * 1000;
 window.timer = null;
-window.gameStart = null;
+window.testStart = null;
 window.pauseTime = 0;
 
 function addClass(tag, name) {
@@ -49,7 +49,7 @@ function formatWord(word) {
     return `<div class="word">${letters}</div>`;
 }
 
-function newGame() {
+function newTest() {
 
     const wordsElement = document.getElementById("words");
     wordsElement.innerHTML = "";
@@ -59,7 +59,8 @@ function newGame() {
         wordsElement.innerHTML += formatWord(randomWord()) + " ";
     }
 
+    document.getElementById('time').innerHTML = (testTime / 1000) + '';
     
 }
 
-newGame();
+newTest();
