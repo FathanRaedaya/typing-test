@@ -35,3 +35,28 @@
 .word {
 	display:inline-block;
 }
+
+#test:focus #words {
+    filter: blur(0);
+}
+
+#test:focus #start {
+    display: none;
+}
+
+#test:focus #cursor {
+    display: block;
+}
+
+#test.over #words {
+    filter: blur(0);
+	opacity: 0.6;
+}
+
+#test.over #start {
+    display: none;
+}
+
+#test.over #cursor {
+    display: none;
+}

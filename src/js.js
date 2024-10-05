@@ -51,6 +51,10 @@ function formatWord(word) {
 
 function newTest() {
 
+    window.timer = null;
+    window.testStart = null;
+    window.pauseTime = 0;
+
     const wordsElement = document.getElementById("words");
     wordsElement.innerHTML = "";
     wordsElement.style.marginTop = '0px'; 
@@ -60,7 +64,36 @@ function newTest() {
     }
 
     document.getElementById('time').innerHTML = (testTime / 1000) + '';
-    
+
+
 }
 
-newTest();
+document.getElementById('restartButton').addEventListener('click', () => {
+    const testElement = document.getElementById('test');
+    testElement.style.opacity = '0';
+    
+    setTimeout(() => {
+        newTest();
+        testElement.style.opacity = '1'; 
+        testElement.focus(); 
+    }, 100); 
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const testElement = document.getElementById('test');
+
+    function focusTest() {
+        testElement.focus();
+    }
+
+    testElement.addEventListener('click', focusTest);
+
+    document.addEventListener('keydown', function(event) {
+        if (document.activeElement !== testElement) {
+            focusTest();
+        }
+    });
+
+    newTest();
+});
+
