@@ -63,10 +63,53 @@ function newTest() {
         wordsElement.innerHTML += formatWord(randomWord()) + " ";
     }
 
+    addClass(document.querySelector('.word'), 'current');
+    addClass(document.querySelector('.letter'), 'current');
     document.getElementById('time').innerHTML = (testTime / 1000) + '';
 
+    const cursor = document.getElementById("cursor");
+    const firstLetter = document.querySelector('.letter.current');
+    if (firstLetter) {
+        cursor.style.top = firstLetter.getBoundingClientRect().top + "px";
+        cursor.style.left = firstLetter.getBoundingClientRect().left + "px";
+    }
 
 }
+
+document.getElementById("test").addEventListener("keydown", event => {
+    const key = event.key;
+    const currentWord = document.querySelector(".word.current");
+    const currentLetter = document.querySelector(".letter.current");
+    const expectedLetter = currentLetter ? currentLetter.innerHTML : '';
+    const isLetter = key.length === 1 && key.match(/[a-z]/i);
+
+    if (isLetter) {
+        if (currentLetter) {
+            addClass(currentLetter, key === expectedLetter ? "correct" : "incorrect");
+            removeClass(currentLetter, "current");
+            if (currentLetter.nextElementSibling) {
+                addClass(currentLetter.nextElementSibling, "current");
+            }
+        } else {
+            const incorrectLetter = document.createElement("span");
+            incorrectLetter.innerHTML = key;
+            incorrectLetter.className = "letter incorrect extra temporary";
+            currentWord.appendChild(incorrectLetter);
+        }
+    }
+
+    const nextLetter = document.querySelector(".letter.current");
+    const nextWord = document.querySelector(".word.current");
+    const cursor = document.getElementById("cursor");
+    if (nextLetter) {
+        cursor.style.top = nextLetter.getBoundingClientRect().top + "px";
+        cursor.style.left = nextLetter.getBoundingClientRect().left + "px";
+    } else if (nextWord) {
+        cursor.style.top = nextWord.getBoundingClientRect().top + "px";
+        cursor.style.left = nextWord.getBoundingClientRect().right + "px";
+    }
+
+});
 
 document.getElementById('restartButton').addEventListener('click', () => {
     const testElement = document.getElementById('test');

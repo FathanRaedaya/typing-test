@@ -60,3 +60,15 @@
 #test.over #cursor {
     display: none;
 }
+
+.letter {
+	opacity: 0.5;
+}
+
+.letter.correct {
+	opacity: 1;
+}
+
+.letter.incorrect {
+	color: red;
+}
