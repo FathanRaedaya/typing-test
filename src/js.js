@@ -22,74 +22,72 @@ const words = [
     "beside", "besides", "within", "beyond", "either", "neither", "such"
   ];
   
-const testTime = 15 * 1000;
-window.timer = null;
-window.testStart = null;
-window.pauseTime = 0;
-
-function addClass(tag, name) {
-    if (tag) {
-        tag.className += " "+name;
-    }
-}
-
-function removeClass(tag, name) {
-    if (tag) {
-        const regex = new RegExp(`\\b${name}\\b`, 'g');
-        tag.className = tag.className.replace(regex, "").trim();
-    }
-}
-
-function randomWord() {
-    return words[Math.floor(Math.random() * words.length)];
-}
-
-function formatWord(word) {
-    const letters = word.split('').map(letter => `<span class="letter">${letter}</span>`).join('');
-    return `<div class="word">${letters}</div>`;
-}
-
-function newTest() {
-
-    window.timer = null;
-    window.testStart = null;
-    window.pauseTime = 0;
-
-    const wordsElement = document.getElementById("words");
-    wordsElement.innerHTML = "";
-    wordsElement.style.marginTop = '0px'; 
-
-    for (let i = 0; i < 100; i++) {
-        wordsElement.innerHTML += formatWord(randomWord()) + " ";
+  class TypingTest {
+    constructor(wordList, testDurationSeconds = 15) {
+        this.words = wordList;
+        this.testTime = testDurationSeconds * 1000;
+        this.timer = null;
+        this.testStart = null;
+        this.pauseTime = 0;
+        
+        this.wordsContainer = document.getElementById("words");
+        this.cursor = document.getElementById("cursor");
+        this.timeDisplay = document.getElementById("time");
+        this.testElement = document.getElementById("test");
+        this.restartButton = document.getElementById("restartButton");
+        
+        this.initialise();
     }
 
-    addClass(document.querySelector('.word'), 'current');
-    addClass(document.querySelector('.letter'), 'current');
-    document.getElementById('time').innerHTML = (testTime / 1000) + '';
-
-    const cursor = document.getElementById("cursor");
-    const firstLetter = document.querySelector('.letter.current');
-    if (firstLetter) {
-        cursor.style.top = firstLetter.getBoundingClientRect().top + "px";
-        cursor.style.left = firstLetter.getBoundingClientRect().left + "px";
+    initialise() {
+        this.setupEventListeners();
+        this.newTest();
     }
 
-}
+    setupEventListeners() {
+        this.handleKeyPress = this.handleKeyPress.bind(this);
+        this.handleRestart = this.handleRestart.bind(this);
+        
+        this.testElement?.addEventListener("keydown", this.handleKeyPress);
+        this.restartButton?.addEventListener("click", this.handleRestart);
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            if (this.testElement) {
+                this.testElement.addEventListener("click", () => this.testElement.focus());
+                document.addEventListener("keydown", () => {
+                    if (document.activeElement !== this.testElement) {
+                        this.testElement.focus();
+                    }
+                });
+            }
+        });
+    }
 
-document.getElementById("test").addEventListener("keydown", event => {
-    const key = event.key;
-    const currentWord = document.querySelector(".word.current");
-    const currentLetter = document.querySelector(".letter.current");
-    const expectedLetter = currentLetter ? currentLetter.innerHTML : '';
-    const isLetter = key.length === 1 && key.match(/[a-z]/i);
-    const isSpace = key === " ";
+    handleKeyPress(event) {
+        const key = event.key;
+        const currentWord = document.querySelector(".word.current");
+        const currentLetter = document.querySelector(".letter.current");
+        const expectedLetter = currentLetter?.innerHTML || "";
+        const isLetter = key.length === 1 && key.match(/[a-z]/i);
+        const isSpace = key === " ";
 
-    if (isLetter) {
+        if (isLetter) {
+            this.handleLetterInput(key, currentWord, currentLetter, expectedLetter);
+        }
+
+        if (isSpace) {
+            this.handleSpaceInput(currentWord, expectedLetter);
+        }
+
+        this.updateCursorPosition();
+    }
+
+    handleLetterInput(key, currentWord, currentLetter, expectedLetter) {
         if (currentLetter) {
-            addClass(currentLetter, key === expectedLetter ? "correct" : "incorrect");
-            removeClass(currentLetter, "current");
+            this.addClass(currentLetter, key === expectedLetter ? "correct" : "incorrect");
+            this.removeClass(currentLetter, "current");
             if (currentLetter.nextElementSibling) {
-                addClass(currentLetter.nextElementSibling, "current");
+                this.addClass(currentLetter.nextElementSibling, "current");
             }
         } else {
             const incorrectLetter = document.createElement("span");
@@ -99,86 +97,114 @@ document.getElementById("test").addEventListener("keydown", event => {
         }
     }
 
-    if (isSpace) {
+    handleSpaceInput(currentWord, expectedLetter) {
         if (expectedLetter !== " ") {
-            const lettersToInvalidate = [...currentWord.querySelectorAll('.letter:not(.correct):not(.temporary)')];
+            const lettersToInvalidate = [...currentWord.querySelectorAll(".letter:not(.correct):not(.temporary)")];
             lettersToInvalidate.forEach(letter => {
-                addClass(letter, 'incorrect');
+                this.addClass(letter, "incorrect");
             });
         }
-        const temporaryLetters = currentWord.querySelectorAll('.temporary');
-        temporaryLetters.forEach(letter => letter.remove());
+
+        currentWord.querySelectorAll(".temporary").forEach(letter => letter.remove());
+        this.moveToNextWord(currentWord);
+    }
+
+    moveToNextWord(currentWord) {
+        this.removeClass(currentWord, "current");
+        let nextWord = currentWord.nextElementSibling;
         
-        removeClass(currentWord, 'current');
-        const nextWord = currentWord.nextElementSibling;
+        while (nextWord && nextWord.nodeType === Node.TEXT_NODE) {
+            nextWord = nextWord.nextElementSibling;
+        }
+
+        if (nextWord && nextWord.classList.contains("word")) {
+            this.setupNextWord(nextWord);
+        }
+    }
+
+    setupNextWord(nextWord) {
+        const currentLetter = document.querySelector(".letter.current");
+        if (currentLetter) {
+            this.removeClass(currentLetter, "current");
+        }
+
+        this.addClass(nextWord, "current");
+        const firstLetter = nextWord.querySelector(".letter");
+        if (firstLetter) {
+            this.addClass(firstLetter, "current");
+        }
+    }
+
+    updateCursorPosition() {
+        const nextLetter = document.querySelector(".letter.current");
+        const nextWord = document.querySelector(".word.current");
         
-        let actualNextWord = nextWord;
-        while (actualNextWord && actualNextWord.nodeType === Node.TEXT_NODE) {
-            actualNextWord = actualNextWord.nextElementSibling;
-        }
-    
-        if (actualNextWord && actualNextWord.classList.contains('word')) {
-            const currentLetter = document.querySelector('.letter.current');
-            if (currentLetter) {
-                removeClass(currentLetter, 'current');
-            }
-    
-            addClass(actualNextWord, 'current');
-            const firstLetter = actualNextWord.querySelector('.letter');
-            if (firstLetter) {
-                addClass(firstLetter, 'current');
-            }
-    
-            const cursor = document.getElementById("cursor");
-            if (firstLetter) {
-                cursor.style.top = firstLetter.getBoundingClientRect().top + "px";
-                cursor.style.left = firstLetter.getBoundingClientRect().left + "px";
-            } else {
-                cursor.style.top = actualNextWord.getBoundingClientRect().top + "px";
-                cursor.style.left = actualNextWord.getBoundingClientRect().left + "px";
-            }
+        if (nextLetter) {
+            const rect = nextLetter.getBoundingClientRect();
+            this.cursor.style.top = `${rect.top}px`;
+            this.cursor.style.left = `${rect.left}px`;
+        } else if (nextWord) {
+            const rect = nextWord.getBoundingClientRect();
+            this.cursor.style.top = `${rect.top}px`;
+            this.cursor.style.left = `${rect.right}px`;
         }
     }
 
-    const nextLetter = document.querySelector(".letter.current");
-    const nextWord = document.querySelector(".word.current");
-    const cursor = document.getElementById("cursor");
-    if (nextLetter) {
-        cursor.style.top = nextLetter.getBoundingClientRect().top + "px";
-        cursor.style.left = nextLetter.getBoundingClientRect().left + "px";
-    } else if (nextWord) {
-        cursor.style.top = nextWord.getBoundingClientRect().top + "px";
-        cursor.style.left = nextWord.getBoundingClientRect().right + "px";
-    }
-
-});
-
-document.getElementById('restartButton').addEventListener('click', () => {
-    const testElement = document.getElementById('test');
-    testElement.style.opacity = '0';
-    
-    setTimeout(() => {
-        newTest();
-        testElement.style.opacity = '1'; 
-        testElement.focus(); 
-    }, 100); 
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const testElement = document.getElementById('test');
-
-    function focusTest() {
-        testElement.focus();
-    }
-
-    testElement.addEventListener('click', focusTest);
-
-    document.addEventListener('keydown', function(event) {
-        if (document.activeElement !== testElement) {
-            focusTest();
+    handleRestart() {
+        if (this.testElement) {
+            this.testElement.style.opacity = "0";
+            setTimeout(() => {
+                this.newTest();
+                this.testElement.style.opacity = "1";
+                this.testElement.focus();
+            }, 100);
         }
-    });
+    }
 
-    newTest();
-});
+    randomWord() {
+        return this.words[Math.floor(Math.random() * this.words.length)];
+    }
 
+    formatWord(word) {
+        return `<div class="word">${
+            word.split("").map(letter => `<span class="letter">${letter}</span>`).join("")
+        }</div>`;
+    }
+
+    addClass(element, className) {
+        if (element && !element.classList.contains(className)) {
+            element.classList.add(className);
+        }
+    }
+
+    removeClass(element, className) {
+        if (element && element.classList.contains(className)) {
+            element.classList.remove(className);
+        }
+    }
+
+    newTest() {
+        this.timer = null;
+        this.testStart = null;
+        this.pauseTime = 0;
+
+        this.wordsContainer.innerHTML = "";
+        this.wordsContainer.style.marginTop = "0px";
+
+        const wordElements = Array.from({ length: 100 }, () => this.formatWord(this.randomWord()));
+        this.wordsContainer.innerHTML = wordElements.join(" ");
+
+        const firstWord = this.wordsContainer.querySelector(".word");
+        const firstLetter = this.wordsContainer.querySelector(".letter");
+        
+        if (firstWord && firstLetter) {
+            this.addClass(firstWord, "current");
+            this.addClass(firstLetter, "current");
+            this.updateCursorPosition();
+        }
+
+        this.timeDisplay.innerHTML = (this.testTime / 1000).toString();
+    }
+}
+
+const typingTest = new TypingTest(words);
