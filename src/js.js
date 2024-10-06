@@ -82,6 +82,7 @@ document.getElementById("test").addEventListener("keydown", event => {
     const currentLetter = document.querySelector(".letter.current");
     const expectedLetter = currentLetter ? currentLetter.innerHTML : '';
     const isLetter = key.length === 1 && key.match(/[a-z]/i);
+    const isSpace = key === " ";
 
     if (isLetter) {
         if (currentLetter) {
@@ -95,6 +96,47 @@ document.getElementById("test").addEventListener("keydown", event => {
             incorrectLetter.innerHTML = key;
             incorrectLetter.className = "letter incorrect extra temporary";
             currentWord.appendChild(incorrectLetter);
+        }
+    }
+
+    if (isSpace) {
+        if (expectedLetter !== " ") {
+            const lettersToInvalidate = [...currentWord.querySelectorAll('.letter:not(.correct):not(.temporary)')];
+            lettersToInvalidate.forEach(letter => {
+                addClass(letter, 'incorrect');
+            });
+        }
+        const temporaryLetters = currentWord.querySelectorAll('.temporary');
+        temporaryLetters.forEach(letter => letter.remove());
+        
+        removeClass(currentWord, 'current');
+        const nextWord = currentWord.nextElementSibling;
+        
+        let actualNextWord = nextWord;
+        while (actualNextWord && actualNextWord.nodeType === Node.TEXT_NODE) {
+            actualNextWord = actualNextWord.nextElementSibling;
+        }
+    
+        if (actualNextWord && actualNextWord.classList.contains('word')) {
+            const currentLetter = document.querySelector('.letter.current');
+            if (currentLetter) {
+                removeClass(currentLetter, 'current');
+            }
+    
+            addClass(actualNextWord, 'current');
+            const firstLetter = actualNextWord.querySelector('.letter');
+            if (firstLetter) {
+                addClass(firstLetter, 'current');
+            }
+    
+            const cursor = document.getElementById("cursor");
+            if (firstLetter) {
+                cursor.style.top = firstLetter.getBoundingClientRect().top + "px";
+                cursor.style.left = firstLetter.getBoundingClientRect().left + "px";
+            } else {
+                cursor.style.top = actualNextWord.getBoundingClientRect().top + "px";
+                cursor.style.left = actualNextWord.getBoundingClientRect().left + "px";
+            }
         }
     }
 
