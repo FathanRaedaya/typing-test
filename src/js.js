@@ -65,11 +65,13 @@ const words = [
 
     handleKeyPress(event) {
         const key = event.key;
-        const currentWord = document.querySelector(".word.current");
-        const currentLetter = document.querySelector(".letter.current");
-        const expectedLetter = currentLetter?.innerHTML || "";
+        const currentWord = document.querySelector('.word.current');
+        const currentLetter = document.querySelector('.letter.current');
         const isLetter = key.length === 1 && key.match(/[a-z]/i);
-        const isSpace = key === " ";
+        const isSpace = key === ' ';
+        const isBackspace = key === 'Backspace';
+        const expectedLetter = currentLetter?.innerHTML || '';
+        const isFirstLetter = currentLetter?.previousElementSibling === null;
 
         if (isLetter) {
             this.handleLetterInput(key, currentWord, currentLetter, expectedLetter);
@@ -79,7 +81,12 @@ const words = [
             this.handleSpaceInput(currentWord, expectedLetter);
         }
 
+        if (isBackspace) {
+            this.handleBackspace(currentWord, currentLetter, isFirstLetter);
+        }
+
         this.updateCursorPosition();
+        this.handleWordScrolling(currentWord);
     }
 
     handleLetterInput(key, currentWord, currentLetter, expectedLetter) {
@@ -132,6 +139,87 @@ const words = [
         const firstLetter = nextWord.querySelector(".letter");
         if (firstLetter) {
             this.addClass(firstLetter, "current");
+        }
+    }
+
+    handleBackspace(currentWord, currentLetter, isFirstLetter) {
+        if (!currentWord) return;
+
+        const temporaryLetters = currentWord.querySelectorAll('.temporary');
+        
+        if (temporaryLetters.length > 0) {
+            this.handleTemporaryLetterBackspace(temporaryLetters);
+        } else if (currentLetter && isFirstLetter) {
+            this.handleFirstLetterBackspace(currentWord, currentLetter);
+        } else if (currentLetter && !isFirstLetter) {
+            this.handleMiddleWordBackspace(currentLetter);
+        } else if (!currentLetter) {
+            this.handleEndWordBackspace(currentWord);
+        }
+    }
+
+    handleTemporaryLetterBackspace(temporaryLetters) {
+        temporaryLetters[temporaryLetters.length - 1].remove();
+    }
+
+    handleFirstLetterBackspace(currentWord, currentLetter) {
+        let previousWord = this.findPreviousWordElement(currentWord);
+        
+        if (!previousWord || !previousWord.classList.contains('word')) {
+            return;
+        }
+
+        const previousWordLetters = previousWord.querySelectorAll('.letter');
+        if (!previousWordLetters.length) return;
+
+        const isFullyCorrect = Array.from(previousWordLetters)
+            .every(letter => letter.classList.contains('correct'));
+
+        if (isFullyCorrect) {
+            return;
+        }
+
+        this.moveBackToPreviousWord(currentWord, currentLetter, previousWord);
+    }
+
+    findPreviousWordElement(currentWord) {
+        let previousWord = currentWord.previousSibling;
+        while (previousWord && previousWord.nodeType === Node.TEXT_NODE) {
+            previousWord = previousWord.previousSibling;
+        }
+        return previousWord;
+    }
+
+    moveBackToPreviousWord(currentWord, currentLetter, previousWord) {
+        this.removeClass(currentWord, 'current');
+        this.addClass(previousWord, 'current');
+        this.removeClass(currentLetter, 'current');
+        
+        if (previousWord.lastChild) {
+            this.addClass(previousWord.lastChild, 'current');
+            this.removeClass(previousWord.lastChild, 'incorrect');
+            this.removeClass(previousWord.lastChild, 'correct');
+        }
+    }
+
+    handleMiddleWordBackspace(currentLetter) {
+        const previousLetter = currentLetter.previousElementSibling;
+        if (!previousLetter) return;
+
+        this.removeClass(currentLetter, 'current');
+        this.addClass(previousLetter, 'current');
+        this.removeClass(previousLetter, 'incorrect');
+        this.removeClass(previousLetter, 'correct');
+    }
+
+    handleEndWordBackspace(currentWord) {
+        const lastLetter = currentWord.lastChild;
+        if (!lastLetter) return;
+        
+        if (!lastLetter.classList.contains('temporary')) {
+            this.addClass(lastLetter, 'current');
+            this.removeClass(lastLetter, 'incorrect');
+            this.removeClass(lastLetter, 'correct');
         }
     }
 
