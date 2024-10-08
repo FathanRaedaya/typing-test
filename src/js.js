@@ -223,6 +223,14 @@ const words = [
         }
     }
 
+    handleWordScrolling(currentWord) {
+        if (currentWord && currentWord.getBoundingClientRect().top > 300) {
+            const words = document.getElementById('words');
+            const margin = parseInt(words.style.marginTop || '0px');
+            words.style.marginTop = (margin - 50) + 'px';
+        }
+    }
+
     updateCursorPosition() {
         const nextLetter = document.querySelector(".letter.current");
         const nextWord = document.querySelector(".word.current");
