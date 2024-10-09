@@ -117,10 +117,6 @@ const words = [
                 this.testStart = null;
                 this.pauseTime = 0;
                 
-                this.testElement.removeEventListener("keydown", this.handleKeyPress);
-                
-                this.testElement.addEventListener("keydown", this.handleKeyPress);
-                
                 this.newTest();
                 
                 if (this.cursor) {
@@ -328,17 +324,6 @@ const words = [
             const rect = nextWord.getBoundingClientRect();
             this.cursor.style.top = `${rect.top}px`;
             this.cursor.style.left = `${rect.right}px`;
-        }
-    }
-
-    handleRestart() {
-        if (this.testElement) {
-            this.testElement.style.opacity = "0";
-            setTimeout(() => {
-                this.newTest();
-                this.testElement.style.opacity = "1";
-                this.testElement.focus();
-            }, 100);
         }
     }
 
