@@ -63,14 +63,99 @@ const words = [
         });
     }
 
+    testOver() {
+        clearInterval(this.timer);
+        this.timer = null;
+        
+        const wpm = this.calculateWPM();
+        
+        this.testElement.removeEventListener("keydown", this.handleKeyPress);
+
+        this.timeDisplay.innerHTML = `${wpm} WPM`;
+        this.cursor.style.display = "none";
+        
+        if (this.restartButton) {
+            this.restartButton.disabled = false;
+        }
+    }
+
+    calculateWPM() {
+        const timeElapsed = Date.now() - this.testStart;
+        const words = [...document.querySelectorAll(".word")];
+        const lastTypedWord = document.querySelector(".word.current");
+        const lastTypedWordIndex = words.indexOf(lastTypedWord) + 1;
+        const typedWords = words.slice(0, lastTypedWordIndex);
+        
+        const correctWords = typedWords.filter(word => {
+            const letters = [...word.children];
+            const incorrectLetters = letters.filter(letter => 
+                letter.className.includes("incorrect")
+            );
+            const correctLetters = letters.filter(letter => 
+                letter.className.includes("correct")
+            );
+            return incorrectLetters.length === 0 && correctLetters.length === letters.length;
+        });
+
+        return Math.round((correctWords.length / timeElapsed) * 60000);
+    }
+
+    restartTest() {
+        this.handleRestart();
+    }
+
+    handleRestart() {
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+
+        if (this.testElement) {
+            this.testElement.style.opacity = "0";
+            
+            setTimeout(() => {
+                this.testStart = null;
+                this.pauseTime = 0;
+                
+                this.testElement.removeEventListener("keydown", this.handleKeyPress);
+                
+                this.testElement.addEventListener("keydown", this.handleKeyPress);
+                
+                this.newTest();
+                
+                if (this.cursor) {
+                    this.cursor.style.display = "block";
+                }
+                
+                this.timeDisplay.innerHTML = (this.testTime / 1000).toString();
+                
+                this.testElement.style.opacity = "1";
+                
+                this.testElement.focus();
+            }, 100);
+        }
+    }
+
     handleKeyPress(event) {
+        if (!this.testStart) {
+            this.testStart = Date.now();
+            this.timer = setInterval(() => {
+                const timeLeft = Math.ceil((this.testTime - (Date.now() - this.testStart)) / 1000);
+                this.timeDisplay.innerHTML = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    this.testOver();
+                }
+            }, 100);
+        }
+
         const key = event.key;
-        const currentWord = document.querySelector('.word.current');
-        const currentLetter = document.querySelector('.letter.current');
+        const currentWord = document.querySelector(".word.current");
+        const currentLetter = document.querySelector(".letter.current");
         const isLetter = key.length === 1 && key.match(/[a-z]/i);
-        const isSpace = key === ' ';
-        const isBackspace = key === 'Backspace';
-        const expectedLetter = currentLetter?.innerHTML || '';
+        const isSpace = key === " ";
+        const isBackspace = key === "Backspace";
+        const expectedLetter = currentLetter?.innerHTML || "";
         const isFirstLetter = currentLetter?.previousElementSibling === null;
 
         if (isLetter) {
@@ -145,7 +230,7 @@ const words = [
     handleBackspace(currentWord, currentLetter, isFirstLetter) {
         if (!currentWord) return;
 
-        const temporaryLetters = currentWord.querySelectorAll('.temporary');
+        const temporaryLetters = currentWord.querySelectorAll(".temporary");
         
         if (temporaryLetters.length > 0) {
             this.handleTemporaryLetterBackspace(temporaryLetters);
@@ -165,15 +250,15 @@ const words = [
     handleFirstLetterBackspace(currentWord, currentLetter) {
         let previousWord = this.findPreviousWordElement(currentWord);
         
-        if (!previousWord || !previousWord.classList.contains('word')) {
+        if (!previousWord || !previousWord.classList.contains("word")) {
             return;
         }
 
-        const previousWordLetters = previousWord.querySelectorAll('.letter');
+        const previousWordLetters = previousWord.querySelectorAll(".letter");
         if (!previousWordLetters.length) return;
 
         const isFullyCorrect = Array.from(previousWordLetters)
-            .every(letter => letter.classList.contains('correct'));
+            .every(letter => letter.classList.contains("correct"));
 
         if (isFullyCorrect) {
             return;
@@ -191,14 +276,14 @@ const words = [
     }
 
     moveBackToPreviousWord(currentWord, currentLetter, previousWord) {
-        this.removeClass(currentWord, 'current');
-        this.addClass(previousWord, 'current');
-        this.removeClass(currentLetter, 'current');
+        this.removeClass(currentWord, "current");
+        this.addClass(previousWord, "current");
+        this.removeClass(currentLetter, "current");
         
         if (previousWord.lastChild) {
-            this.addClass(previousWord.lastChild, 'current');
-            this.removeClass(previousWord.lastChild, 'incorrect');
-            this.removeClass(previousWord.lastChild, 'correct');
+            this.addClass(previousWord.lastChild, "current");
+            this.removeClass(previousWord.lastChild, "incorrect");
+            this.removeClass(previousWord.lastChild, "correct");
         }
     }
 
@@ -206,28 +291,28 @@ const words = [
         const previousLetter = currentLetter.previousElementSibling;
         if (!previousLetter) return;
 
-        this.removeClass(currentLetter, 'current');
-        this.addClass(previousLetter, 'current');
-        this.removeClass(previousLetter, 'incorrect');
-        this.removeClass(previousLetter, 'correct');
+        this.removeClass(currentLetter, "current");
+        this.addClass(previousLetter, "current");
+        this.removeClass(previousLetter, "incorrect");
+        this.removeClass(previousLetter, "correct");
     }
 
     handleEndWordBackspace(currentWord) {
         const lastLetter = currentWord.lastChild;
         if (!lastLetter) return;
         
-        if (!lastLetter.classList.contains('temporary')) {
-            this.addClass(lastLetter, 'current');
-            this.removeClass(lastLetter, 'incorrect');
-            this.removeClass(lastLetter, 'correct');
+        if (!lastLetter.classList.contains("temporary")) {
+            this.addClass(lastLetter, "current");
+            this.removeClass(lastLetter, "incorrect");
+            this.removeClass(lastLetter, "correct");
         }
     }
 
     handleWordScrolling(currentWord) {
         if (currentWord && currentWord.getBoundingClientRect().top > 300) {
-            const words = document.getElementById('words');
-            const margin = parseInt(words.style.marginTop || '0px');
-            words.style.marginTop = (margin - 50) + 'px';
+            const words = document.getElementById("words");
+            const margin = parseInt(words.style.marginTop || "0px");
+            words.style.marginTop = (margin - 50) + "px";
         }
     }
 
@@ -280,26 +365,34 @@ const words = [
     }
 
     newTest() {
-        this.timer = null;
+
         this.testStart = null;
-        this.pauseTime = 0;
+        this.testElement.addEventListener("keydown", this.handleKeyPress);
 
-        this.wordsContainer.innerHTML = "";
-        this.wordsContainer.style.marginTop = "0px";
+        if (this.wordsContainer) {
+            this.wordsContainer.innerHTML = "";
+            this.wordsContainer.style.marginTop = "0px";
 
-        const wordElements = Array.from({ length: 100 }, () => this.formatWord(this.randomWord()));
-        this.wordsContainer.innerHTML = wordElements.join(" ");
+            const wordElements = Array.from({ length: 100 }, () => this.formatWord(this.randomWord()));
+            this.wordsContainer.innerHTML = wordElements.join(" ");
 
-        const firstWord = this.wordsContainer.querySelector(".word");
-        const firstLetter = this.wordsContainer.querySelector(".letter");
-        
-        if (firstWord && firstLetter) {
-            this.addClass(firstWord, "current");
-            this.addClass(firstLetter, "current");
-            this.updateCursorPosition();
+            const firstWord = this.wordsContainer.querySelector(".word");
+            const firstLetter = this.wordsContainer.querySelector(".letter");
+            
+            if (firstWord && firstLetter) {
+                this.addClass(firstWord, "current");
+                this.addClass(firstLetter, "current");
+                this.updateCursorPosition();
+            }
         }
 
-        this.timeDisplay.innerHTML = (this.testTime / 1000).toString();
+        if (this.timeDisplay) {
+            this.timeDisplay.innerHTML = (this.testTime / 1000).toString();
+        }
+
+        if (this.cursor) {
+            this.cursor.style.display = "block";
+        }
     }
 }
 
