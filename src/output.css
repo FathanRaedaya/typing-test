@@ -639,6 +639,12 @@ video {
   justify-content: space-between;
 }
 
+.space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
 .overflow-hidden {
   overflow: hidden;
 }
@@ -789,6 +795,25 @@ video {
   100% {
     opacity: 1;
   }
+}
+
+.time-option {
+  padding: 5px 10px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.time-option:hover {
+  opacity: 1 !important;
+}
+
+#timeOptions {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .hover\:cursor-pointer:hover {

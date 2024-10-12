@@ -23,9 +23,9 @@ const words = [
   ];
   
   class TypingTest {
-    constructor(wordList, testDurationSeconds = 15) {
+    constructor(wordList, initialTesttimeSeconds = 15) {
         this.words = wordList;
-        this.testTime = testDurationSeconds * 1000;
+        this.testTime = initialTesttimeSeconds * 1000;
         this.timer = null;
         this.testStart = null;
         this.pauseTime = 0;
@@ -35,18 +35,21 @@ const words = [
         this.timeDisplay = document.getElementById("time");
         this.testElement = document.getElementById("test");
         this.restartButton = document.getElementById("restartButton");
+        this.timeOptions = document.getElementById("timeOptions");
         
         this.initialise();
     }
 
     initialise() {
         this.setupEventListeners();
+        this.setuptimeOptions();
         this.newTest();
     }
 
     setupEventListeners() {
         this.handleKeyPress = this.handleKeyPress.bind(this);
         this.handleRestart = this.handleRestart.bind(this);
+        this.handletimeChange = this.handletimeChange.bind(this);
         
         this.testElement?.addEventListener("keydown", this.handleKeyPress);
         this.restartButton?.addEventListener("click", this.handleRestart);
@@ -59,6 +62,35 @@ const words = [
                         this.testElement.focus();
                     }
                 });
+            }
+        });
+    }
+
+    setuptimeOptions() {
+        const times = [15, 30, 60, 120];
+        times.forEach(time => {
+            const button = document.createElement("button");
+            button.textContent = `${time}`;
+            button.className = "time-option";
+            button.addEventListener("click", () => this.handletimeChange(time));
+            this.timeOptions.appendChild(button);
+        });
+        this.updatetimeButtonStyles();
+    }
+
+    handletimeChange(time) {
+        this.testTime = time * 1000;
+        this.updatetimeButtonStyles();
+        this.restartTest();
+    }
+
+    updatetimeButtonStyles() {
+        const buttons = this.timeOptions.querySelectorAll(".time-option");
+        buttons.forEach(button => {
+            if (parseInt(button.textContent) === this.testTime / 1000) {
+                button.style.opacity = "1";
+            } else {
+                button.style.opacity = "0.5";
             }
         });
     }
@@ -350,7 +382,6 @@ const words = [
     }
 
     newTest() {
-
         this.testStart = null;
         this.testElement.addEventListener("keydown", this.handleKeyPress);
 
@@ -378,6 +409,8 @@ const words = [
         if (this.cursor) {
             this.cursor.style.display = "block";
         }
+
+        this.updatetimeButtonStyles();
     }
 }
 

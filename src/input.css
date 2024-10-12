@@ -84,3 +84,22 @@
 		opacity: 1;
 	}
 }
+
+.time-option {
+	padding: 5px 10px;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: opacity 0.3s ease;
+  }
+  
+  .time-option:hover {
+	opacity: 1 !important;
+  }
+  
+  #timeOptions {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+  }
