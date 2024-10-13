@@ -1,8 +1,11 @@
 # Get Typing
 
-currently in progress but still accessible here: [typingtest.fathanraedaya.com](https://typingtest.fathanraedaya.com/)
+Work in progress!
 
-![image](https://github.com/user-attachments/assets/340d731f-7126-4059-9896-6309c02b2eb1)
+[typingtest.fathanraedaya.com](https://typingtest.fathanraedaya.com/)
+
+![image](https://github.com/user-attachments/assets/05caf4b2-3e18-4aa4-b100-31f67ed5e5e3)
+
 
 
 
