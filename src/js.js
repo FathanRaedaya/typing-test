@@ -1,30 +1,11 @@
-const words = [
-    "the", "be", "to", "of", "and", "a", "in", "that", "have", "it", "for", 
-    "not", "on", "with", "he", "as", "you", "do", "at", "this", "but", "his", 
-    "by", "from", "they", "we", "say", "her", "she", "or", "an", "will", "my", 
-    "one", "all", "would", "there", "their", "what", "so", "up", "out", "if", 
-    "about", "who", "get", "which", "go", "me", "when", "make", "can", "like", 
-    "time", "no", "just", "him", "know", "take", "person", "into", "year", "your", 
-    "good", "some", "could", "them", "see", "other", "than", "then", "now", 
-    "look", "only", "come", "its", "over", "think", "also", "back", "after", 
-    "use", "two", "how", "our", "work", "first", "well", "way", "even", "new", 
-    "want", "because", "any", "these", "give", "day", "most", "us", "is", "am", 
-    "are", "was", "were", "has", "had", "been", "being", "were", "where", "those", 
-    "much", "many", "too", "more", "such", "each", "own", "shall", "ought", 
-    "while", "since", "might", "must", "therefore", "thus", "still", "between", 
-    "around", "every", "before", "under", "upon", "without", "against", "within", 
-    "although", "during", "again", "always", "both", "however", "whenever", 
-    "instead", "either", "neither", "already", "perhaps", "maybe", "probably", 
-    "yet", "often", "likely", "seem", "seems", "seemed", "among", "another", 
-    "least", "less", "moreover", "whom", "whose", "whenever", "wherever", 
-    "thereupon", "whereupon", "whatever", "whoever", "whichever", "through", 
-    "though", "until", "often", "despite", "about", "toward", "towards", 
-    "beside", "besides", "within", "beyond", "either", "neither", "such"
-  ];
-  
-  class TypingTest {
-    constructor(wordList, initialTesttimeSeconds = 15) {
-        this.words = wordList;
+
+class TypingTest {
+    constructor(easyWords, mediumWords, hardWords, initialTesttimeSeconds = 15) {
+        this.easyWords = easyWords;
+        this.mediumWords = mediumWords;
+        this.hardWords = hardWords;
+        this.currentDifficulty = 'easy';
+        this.words = this.easyWords;
         this.testTime = initialTesttimeSeconds * 1000;
         this.timer = null;
         this.testStart = null;
@@ -36,6 +17,7 @@ const words = [
         this.testElement = document.getElementById("test");
         this.restartButton = document.getElementById("restartButton");
         this.timeOptions = document.getElementById("timeOptions");
+        this.difficultyOptions = document.getElementById("difficultyOptions");
         
         this.initialise();
     }
@@ -43,6 +25,7 @@ const words = [
     initialise() {
         this.setupEventListeners();
         this.setuptimeOptions();
+        this.setupDifficultyOptions();
         this.newTest();
     }
 
@@ -50,6 +33,7 @@ const words = [
         this.handleKeyPress = this.handleKeyPress.bind(this);
         this.handleRestart = this.handleRestart.bind(this);
         this.handletimeChange = this.handletimeChange.bind(this);
+        this.handleDifficultyChange = this.handleDifficultyChange.bind(this);
         
         this.testElement?.addEventListener("keydown", this.handleKeyPress);
         this.restartButton?.addEventListener("click", this.handleRestart);
@@ -62,6 +46,46 @@ const words = [
                         this.testElement.focus();
                     }
                 });
+            }
+        });
+    }
+
+    setupDifficultyOptions() {
+        const difficulties = ['easy', 'medium', 'hard'];
+        difficulties.forEach(difficulty => {
+            const button = document.createElement("button");
+            button.textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+            button.className = "difficulty-option";
+            button.addEventListener("click", () => this.handleDifficultyChange(difficulty));
+            this.difficultyOptions.appendChild(button);
+        });
+        this.updateDifficultyButtonStyles();
+    }
+
+    handleDifficultyChange(difficulty) {
+        this.currentDifficulty = difficulty;
+        switch (difficulty) {
+            case 'easy':
+                this.words = this.easyWords;
+                break;
+            case 'medium':
+                this.words = this.mediumWords;
+                break;
+            case 'hard':
+                this.words = this.hardWords;
+                break;
+        }
+        this.updateDifficultyButtonStyles();
+        this.restartTest();
+    }
+
+    updateDifficultyButtonStyles() {
+        const buttons = this.difficultyOptions.querySelectorAll(".difficulty-option");
+        buttons.forEach(button => {
+            if (button.textContent.toLowerCase() === this.currentDifficulty) {
+                button.style.opacity = "1";
+            } else {
+                button.style.opacity = "0.5";
             }
         });
     }
@@ -411,7 +435,10 @@ const words = [
         }
 
         this.updatetimeButtonStyles();
+        this.updateDifficultyButtonStyles();
     }
 }
 
-const typingTest = new TypingTest(words);
+import { easyWords, mediumWords, hardWords } from './words.js';
+
+new TypingTest(easyWords, mediumWords, hardWords);

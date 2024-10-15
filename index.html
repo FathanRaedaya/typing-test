@@ -8,16 +8,13 @@
 <body class="bg-[#16423C] font-mont">
   <section class="max-w-[50%] h-screen mx-auto">
 
-    <header class="w-[100%] h-[20vh]">
-      <h1 class="text-white text-[250%] pt-[10%]">get<span class="text-[#C4DAD2]">Typing</span></h1>
+    <header class="w-[100%] h-[20vh] flex pt-[10%] items-center">
+      <h1 class="text-white text-[250%]">get<span class="text-[#C4DAD2]">Typing</span></h1>
     </header>
 
     <section class="w-[100%] h-[5vh] flex justify-between items-center">
       <div id="time" class="text-white text-[125%]"></div>
-      <div id="timeOptions" class="flex justify-center items-center space-x-2"></div>
-      <div id="restart">
-        <img id="restartButton" src="src/assets/images/restart.png" alt="Restart button" class="cursor-pointer hover:cursor-pointer">
-      </div>
+      <div id="difficultyOptions" class="difficulty-option flex"><div id="timeOptions" class="time-option"></div></div>
     </section>
 
     <section class="w-[100%] h-[150px] overflow-hidden leading-[50px] relative outline-none" id="test" tabindex="0">
@@ -25,10 +22,15 @@
       <div id="cursor" class="w-[2px] h-[40px] fixed bg-[#FFF0D1] top-[230px] animate-flashing hidden"></div>
       <div id="start" class="absolute inset-0 flex items-center justify-center text-white text-[125%]">Click here or press any key to start typing!</div>
     </section>
+
+    <section class="w-[100%] pt-[10px] flex justify-center">
+        <img id="restartButton" src="src/assets/images/restart.png" alt="Restart button" class="cursor-pointer hover:cursor-pointer">
+    </section>
+
   </section>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="src/js.js"></script>
+  <script type="module" src="src/js.js"></script>
 
 </body>
 </html>
