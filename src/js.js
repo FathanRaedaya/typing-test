@@ -18,7 +18,10 @@ class TypingTest {
         this.restartButton = document.getElementById("restartButton");
         this.timeOptions = document.getElementById("timeOptions");
         this.difficultyOptions = document.getElementById("difficultyOptions");
-        
+        this.wpm = document.getElementById("wpm");
+        this.accuracy = document.getElementById("accuracy");
+        this.start = document.getElementById("start");
+
         this.initialise();
     }
 
@@ -124,11 +127,18 @@ class TypingTest {
         this.timer = null;
         
         const wpm = this.calculateWPM();
+        const letterAccuracy = this.calculateLetterAccuracy();
+
         
         this.testElement.removeEventListener("keydown", this.handleKeyPress);
 
-        this.timeDisplay.innerHTML = `${wpm} WPM`;
+        this.start.style.opacity= "0";
+        this.timeDisplay.innerHTML = "";
         this.cursor.style.display = "none";
+        this.wordsContainer.style.display = "none";
+        this.wpm.innerHTML = `WPM: ${wpm}`;
+        this.accuracy.innerHTML = `Accuracy: ${letterAccuracy}%`;
+
         
         if (this.restartButton) {
             this.restartButton.disabled = false;
@@ -156,6 +166,32 @@ class TypingTest {
         return Math.round((correctWords.length / timeElapsed) * 60000);
     }
 
+    calculateLetterAccuracy() {
+        const words = [...document.querySelectorAll(".word")];
+        let correctLetters = 0;
+        let totalLetters = 0;
+
+        words.forEach(word => {
+            const letters = [...word.querySelectorAll(".letter")];
+            letters.forEach(letter => {
+                if (letter.classList.contains("correct")) {
+                    correctLetters++;
+                }
+                if (
+                    letter.classList.contains("correct") || 
+                    letter.classList.contains("incorrect")
+                ) {
+                    totalLetters++;
+                }
+            });
+        });
+
+        if (totalLetters === 0) return 0;
+
+        return Math.round((correctLetters / totalLetters) * 100);
+    }
+
+
     restartTest() {
         this.handleRestart();
     }
@@ -178,7 +214,7 @@ class TypingTest {
                 if (this.cursor) {
                     this.cursor.style.display = "block";
                 }
-                
+
                 this.timeDisplay.innerHTML = (this.testTime / 1000).toString();
                 
                 this.testElement.style.opacity = "1";
@@ -410,6 +446,7 @@ class TypingTest {
         this.testElement.addEventListener("keydown", this.handleKeyPress);
 
         if (this.wordsContainer) {
+            this.wordsContainer.style.display = "block";
             this.wordsContainer.innerHTML = "";
             this.wordsContainer.style.marginTop = "0px";
 
@@ -433,6 +470,12 @@ class TypingTest {
         if (this.cursor) {
             this.cursor.style.display = "block";
         }
+
+        if (this.start) {
+            this.start.style.opacity = "1";
+        }
+
+
 
         this.updatetimeButtonStyles();
         this.updateDifficultyButtonStyles();
