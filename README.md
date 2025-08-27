@@ -20,5 +20,26 @@ A clean, responsive typing test application that measures your typing speed and 
 - HTML5
 - Tailwind CSS
 
+<br>
 
+# Installation
 
+## How to install and run the project
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/FathanRaedaya/getTyping.git
+   cd getTyping
+   ```
+
+2. Install the dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run watch:css
+   ```
+
+4. Open your browser and navigate to `http://127.0.0.1:5500/index.html` to see the app in action.
