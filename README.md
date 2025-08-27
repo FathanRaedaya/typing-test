@@ -2,6 +2,8 @@
 
 A clean, responsive typing test application that measures your typing speed and accuracy.
 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/955ba6fe-71d7-4da7-8b17-44588d1980b0" />
+
 **Project Link**: [getTyping](https://typingtest.fathanraedaya.com/)
 
 
