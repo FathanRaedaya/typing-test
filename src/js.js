@@ -128,8 +128,6 @@ class TypingTest {
         
         const wpm = this.calculateWPM();
         const letterAccuracy = this.calculateLetterAccuracy();
-
-        
         this.testElement.removeEventListener("keydown", this.handleKeyPress);
 
         this.start.style.opacity= "0";
@@ -259,7 +257,6 @@ class TypingTest {
         }
 
         this.updateCursorPosition();
-        this.handleWordScrolling(currentWord);
     }
 
     handleLetterInput(key, currentWord, currentLetter, expectedLetter) {
@@ -299,6 +296,7 @@ class TypingTest {
 
         if (nextWord && nextWord.classList.contains("word")) {
             this.setupNextWord(nextWord);
+            this.handleLineScrolling(nextWord);
         }
     }
 
@@ -396,13 +394,34 @@ class TypingTest {
         }
     }
 
-    handleWordScrolling(currentWord) {
-        if (currentWord && currentWord.getBoundingClientRect().top > 300) {
-            const words = document.getElementById("words");
-            const margin = parseInt(words.style.marginTop || "0px");
-            words.style.marginTop = (margin - 50) + "px";
+    handleLineScrolling(currentWord) {
+        if (!currentWord) return;
+
+        const words = document.getElementById("words");
+        const container = words.parentElement;
+        const lineHeight = 50;
+        const maxVisibleLines = 2;
+
+        const wordTop = currentWord.getBoundingClientRect().top;
+        const containerTop = container.getBoundingClientRect().top;
+
+        const lineIndex = Math.floor((wordTop - containerTop) / lineHeight);
+
+        if (lineIndex >= maxVisibleLines) {
+            const margin = parseInt(words.style.marginTop || "0", 10);
+            words.style.transition = "margin-top 0.3s ease";
+            words.style.marginTop = (margin - lineHeight) + "px";
+
+            this.updateCursorPosition();
+
+            setTimeout(() => {
+                this.updateCursorPosition();
+            }, 310);
         }
     }
+
+
+
 
     updateCursorPosition() {
         const nextLetter = document.querySelector(".letter.current");
